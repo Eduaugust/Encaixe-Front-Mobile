@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "Encaixe",
+    "slug": "Encaixe",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
