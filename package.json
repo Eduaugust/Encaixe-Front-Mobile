@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-community/checkbox": "^0.5.12",
     "@react-native-community/datetimepicker": "4.0.0",
     "@react-navigation/bottom-tabs": "^6.2.0",
     "@react-navigation/native": "^6.0.8",
@@ -21,6 +22,7 @@
     "react-hook-form": "^7.29.0",
     "react-native": "0.64.3",
     "react-native-date-picker": "^4.2.0",
+    "react-native-multiple-choice-picker": "^1.0.6",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.10.1",
     "react-native-vector-icons": "^9.1.0",

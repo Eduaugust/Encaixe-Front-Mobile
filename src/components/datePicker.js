@@ -14,7 +14,15 @@ const datePicker = ({passDate}) => {
         let day = dateObj.getUTCDate();
         let year = dateObj.getUTCFullYear();
         let week = weekday[dateObj.getDay()];
-        return week + "   " + day + "/" + month +  "/" + year;
+        return week + "  //  " + day + "/" + month +  "/" + year;
+    }
+
+    const formatDateToDb = (date) => {
+        let dateObj = date
+        let month = dateObj.getUTCMonth() + 1; //months from 1-12
+        let day = dateObj.getUTCDate();
+        let year = dateObj.getUTCFullYear();
+        return year + "/" + month + "/" + day;
     }
 
     const [date, setDate] = useState(new Date());
@@ -31,7 +39,7 @@ const datePicker = ({passDate}) => {
         onChange={(event, selectedDate)=>{
             setOpen(false); 
             if(selectedDate != undefined) {
-                passDate(selectedDate)
+                passDate(formatDateToDb(selectedDate))
                 setDate(selectedDate)
             }}}
         />        
