@@ -3,14 +3,43 @@ import {View, Text, TextInput, StyleSheet, Button} from 'react-native'
 import DatePicker from './datePicker'
 import CheckBox from '@react-native-community/checkbox';
 
+
 const InsertForms = () => {
-    const todayDate = new Date()
+    const todayDate = formatDateToDb(new Date())
+    const RegExp = /\+\d{2}\s\(\d{2}\)\s\d{4,5}-?\d{4}/g;
+
+    function mTel(tel) {
+      tel=tel.slice(0, 17)
+      tel=tel.replace(/\D/g,"")
+      tel=tel.replace(/^(\d)/,"+$1")
+      tel=tel.replace(/(.{3})(\d)/,"$1($2")
+      tel=tel.replace(/(.{6})(\d)/,"$1)$2")
+      if(tel.length == 12) {
+          tel=tel.replace(/(.{1})$/,"-$1")
+      } else if (tel.length == 13) {
+          tel=tel.replace(/(.{2})$/,"-$1")
+      } else if (tel.length == 14) {
+          tel=tel.replace(/(.{3})$/,"-$1")
+      } else if (tel.length == 15) {
+          tel=tel.replace(/(.{4})$/,"-$1")
+      } else if (tel.length > 15) {
+          tel=tel.replace(/(.{4})$/,"-$1")
+      }
+      return tel;
+  }
+  function formatDateToDb(date) {
+    let dateObj = date
+    let month = dateObj.getUTCMonth() + 1; //months from 1-12
+    let day = dateObj.getUTCDate();
+    let year = dateObj.getUTCFullYear();
+    return year + "/" + month.pad() + "/" + day.pad();
+}
     
     const [name, setName] = useState('')
     const [number, setNumber] = useState('')
     const [service, setService] = useState('')
-    const [start, setStart] = useState(todayDate.toISOString())
-    const [end, setEnd] = useState(todayDate.toISOString())
+    const [start, setStart] = useState(todayDate)
+    const [end, setEnd] = useState(todayDate)
     const [morning, setMorning] = useState(true)
     const [afternoon, setAfternoon] = useState(true)
     const [tuesday, setTuesday] = useState(true)
@@ -22,23 +51,34 @@ const InsertForms = () => {
 
   
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
     try {
       if (name.trim() === ''){
         throw new Error('Insira um nome')
       }
-      if (number.length != 17){
-        throw new Error('Copie e cole o número do whatsapp \nEx: +55 13 99334-0029')
+      if (number.length > 17 || number.length < 16){
+        throw new Error('Copie e cole o número do whatsapp \nEx: +55(13)99334-0029  \n Aceito somente +55')
       }
       if (start > end) {
         throw new Error('Data inicial deve ser menor que a final')
       }
 
       const submitSet = {
-        name, number, service, start, end, morning, afternoon, tuesday, wednesday, thursday, friday, saturday
+        name, number, service, start, end, morning, afternoon, tuesday, wednesday, thursday, friday, saturday, 'userId': 1
       }
-      console.log(submitSet)
-      alert('Enviado! \nArruma a data')
+
+      const req = await fetch('https://encaixe-back.herokuapp.com/clients', {
+        method: 'POST',
+        body: JSON.stringify(submitSet),
+        headers: {'Content-Type': 'application/json'}
+      })
+      const json = await req.json();
+      if(json.type === 'Error'){
+        alert('Algum erro ocorreu: \n' + json.message)
+      } else{
+        alert('Cliente encaixada com sucesso!')
+      }
+
     } catch (e) {
       alert(e.message)
     }
@@ -51,7 +91,7 @@ const InsertForms = () => {
           {/* Nome/ número */}
             <View style={styles.containerRow}>
                 <TextField label={'Nome'} placeholder={'Digite um nome'} onChangeText={t=>setName(t)} value={name} />
-                <TextField label={'Número'} placeholder={'DDD + número'} onChangeText={t=>setNumber(t)} value={number} />
+                <TextField label={'Número'} placeholder={'+55(99)99999-9999'} onChangeText={t=>setNumber(mTel(t))} value={number} />
             </View>
 
             {/* Serviço / Período */}
@@ -112,14 +152,7 @@ const TextField = ({ label, value, ...inputProps }) => (
     <View style={styles.containerText}>
       <Text style={styles.label}>{label}</Text>
       <DatePicker
-        passDate={(data)=>{
-          if(is_start){
-            data.toDate().setHours(0); data.setMinutes(0); data.setSeconds(0) 
-          } else {
-            data.toDate().setHours(23); data.setMinutes(59); data.setSeconds(59) 
-          }
-          setName(data);
-        } }
+        passDate={(data)=>{setName(data);}}
         style={styles.input}
       />
     </View>
@@ -168,5 +201,11 @@ const styles = StyleSheet.create({
         borderRadius: 5,
     },
 })
+
+Number.prototype.pad = function(size) {
+  var s = String(this);
+  while (s.length < (size || 2)) {s = "0" + s;}
+  return s;
+}
 
 export default InsertForms;
