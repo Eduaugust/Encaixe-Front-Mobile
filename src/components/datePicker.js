@@ -14,7 +14,7 @@ const datePicker = ({passDate}) => {
         let day = dateObj.getUTCDate();
         let year = dateObj.getUTCFullYear();
         let week = weekday[dateObj.getDay()];
-        return week + "  //  " + day.pad() + "/" + month.pad() +  "/" + year;
+        return week + " // " + day.pad() + "/" + month.pad() +  "/" + year;
     }
 
     const formatDateToDb = (date) => {
@@ -22,7 +22,7 @@ const datePicker = ({passDate}) => {
         let month = dateObj.getUTCMonth() + 1; //months from 1-12
         let day = dateObj.getUTCDate();
         let year = dateObj.getUTCFullYear();
-        return year + "/" + month.pad() + "/" + day.pad();
+        return year + "-" + month.pad() + "-" + day.pad();
     }
 
     const [date, setDate] = useState(new Date());

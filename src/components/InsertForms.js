@@ -1,7 +1,9 @@
 import React, {useState} from 'react'
-import {View, Text, TextInput, StyleSheet, Button} from 'react-native'
+import {View, Text, TextInput, StyleSheet, Button, Alert} from 'react-native'
 import DatePicker from './datePicker'
 import CheckBox from '@react-native-community/checkbox';
+import Icon from 'react-native-vector-icons/Ionicons';
+
 
 
 const InsertForms = () => {
@@ -32,8 +34,20 @@ const InsertForms = () => {
     let month = dateObj.getUTCMonth() + 1; //months from 1-12
     let day = dateObj.getUTCDate();
     let year = dateObj.getUTCFullYear();
-    return year + "/" + month.pad() + "/" + day.pad();
-}
+    return year + "-" + month.pad() + "-" + day.pad();
+  }
+  const clearForm = () => {
+    setName('')
+    setNumber('')
+    setService('')
+    setMorning(true)
+    setAfternoon(true)
+    setTuesday(true)
+    setWednesday(true)
+    setThursday(true)
+    setFriday(true)
+    setSaturday(true)
+  }
     
     const [name, setName] = useState('')
     const [number, setNumber] = useState('')
@@ -57,7 +71,7 @@ const InsertForms = () => {
         throw new Error('Insira um nome')
       }
       if (number.length > 17 || number.length < 16){
-        throw new Error('Copie e cole o número do whatsapp \nEx: +55(13)99334-0029  \n Aceito somente +55')
+        throw new Error('Copie e cole o número do whatsapp \nEx: +55(13)99334-0029  \nAceito somente +55')
       }
       if (start > end) {
         throw new Error('Data inicial deve ser menor que a final')
@@ -74,13 +88,14 @@ const InsertForms = () => {
       })
       const json = await req.json();
       if(json.type === 'Error'){
-        alert('Algum erro ocorreu: \n' + json.message)
+        Alert.alert('Erro', json.message)
       } else{
-        alert('Cliente encaixada com sucesso!')
+        Alert.alert('Concluído!', 'Cliente encaixada com sucesso!');
+        clearForm();
       }
 
     } catch (e) {
-      alert(e.message)
+      Alert.alert('Erro', e.message)
     }
   }
 
@@ -131,7 +146,8 @@ const InsertForms = () => {
 
             {/* Enviar */}
             <View style={styles.containerRow}>
-                <Button onPress={handleSubmit} title={'Adicionar na lista'} />
+                <Button onPress={handleSubmit} title={'Adicionar na lista'} style={{marginHorizontal: 30}} />
+                <Icon.Button  name="ios-refresh"  color='white' size={18} backgroundColor='transparent' onPress={clearForm} style={{marginHorizontal: 30}} />
             </View>
         </View>
     )

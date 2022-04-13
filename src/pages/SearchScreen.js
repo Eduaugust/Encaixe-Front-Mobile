@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native'
 import ItemList from '../components/itemList'
 import DatePicker from '../components/datePicker';
-import { Text, View, ActivityIndicator } from 'react-native'
+import { Text, View, ActivityIndicator, Alert } from 'react-native'
 
 
 
@@ -33,10 +33,16 @@ const HomeScreen = () => {
     useEffect(() => {
         const getData = async () => {
             setLoading(true)
-            const req = await fetch('https://encaixe-back.herokuapp.com/clients', 'get')
+            const req = await fetch(`https://encaixe-back.herokuapp.com/clients/${date}` , {
+                method: 'GET',
+            })
             const json = await req.json();
-            setData(json)
-            console.log(json)
+            if(json.type === 'Error'){
+                Alert.alert('Erro', json.message)
+                setData([])
+            } else{
+                setData(json)
+            }
             setLoading(false)
 
         }
@@ -79,7 +85,7 @@ function formatDateToDb(date) {
     let month = dateObj.getUTCMonth() + 1; //months from 1-12
     let day = dateObj.getUTCDate();
     let year = dateObj.getUTCFullYear();
-    return year + "/" + month.pad() + "/" + day.pad();
+    return year + "-" + month.pad() + "-" + day.pad();
 }
 
 export default HomeScreen
