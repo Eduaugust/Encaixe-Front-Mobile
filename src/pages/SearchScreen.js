@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native'
 import ItemList from '../components/itemList'
 import DatePicker from '../components/datePicker';
-import { Text, View, ActivityIndicator, Alert } from 'react-native'
+import { Text, View, ActivityIndicator, Alert, Linking } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const BackGroundView = styled.View`
@@ -31,7 +31,7 @@ const HomeScreen = () => {
     useEffect(() => {
         getData()
     }
-        , [date])
+    , [date])
 
     const getData = async () => {
         setLoading(true)
@@ -46,6 +46,17 @@ const HomeScreen = () => {
             setData(json)
         }
         setLoading(false)
+    }
+
+    const OpenWhats = (data) => {
+        const url = 'whatsapp://send?text=' + 'Oiii, surgiu um horário para o dia '+ data.date  + '&phone=55' + (data.number).toString()
+        Linking.openURL(url)
+        .then(data => {
+          console.log("WhatsApp Opened successfully " + data);
+        })
+        .catch(() => {
+            Alert.alert('Erro', "Make sure WhatsApp installed on your device");
+        });
     }
 
     
@@ -66,7 +77,7 @@ const HomeScreen = () => {
         <List
         data={data}
         keyExtractor={item=>item.id}
-        renderItem={({item})=><ItemList data={item} refresh={()=>getData()} />}
+        renderItem={({item})=><ItemList data={item} refresh={()=>getData()} icon='logo-whatsapp' funcWhoCalled={(data)=>{OpenWhats(data)}} />}
         />
       }
         

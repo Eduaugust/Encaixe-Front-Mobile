@@ -1,76 +1,44 @@
-import React, {useState, useEffect} from 'react';
-import {View, SafeAreaView, FlatList, TextInput} from 'react-native'
-import ItemList from '../components/itemList'
+import React from 'react';
+import styled from 'styled-components/native'
+import InsertForms from '../components/InsertForms'
+import { Alert } from 'react-native'
 
-
+const BackGroundView = styled.View`
+    flex: 1;
+    justifyContent: center;
+    alignItems: center;
+`;
 
 const EditScreen = () => {
 
-    const [search, setSearch] = useState('')
-    const [loading, setLoading] = useState(false)
-    const [data, setData] = useState([])
-    const [filterData, setFilterData] = useState([])
+    const todayDate = formatDateToDb(new Date())
 
-    useEffect(() => {
-        getData()
+    function formatDateToDb(date) {
+        let dateObj = date
+        let month = dateObj.getUTCMonth() + 1; //months from 1-12
+        let day = dateObj.getUTCDate();
+        let year = dateObj.getUTCFullYear();
+        return year + "-" + month.pad() + "-" + day.pad();
+      }
+
+
+    const postClient = async (submitSet) => {
+        const req = await fetch('https://encaixe-back.herokuapp.com/clients', {
+        method: 'POST',
+        body: JSON.stringify(submitSet),
+        headers: {'Content-Type': 'application/json'}
+      })
+      const json = await req.json();
+      if(json.type === 'Error'){
+        Alert.alert('Erro', json.message)
+      } else{
+        Alert.alert('Concluído!', 'Cliente entrou na fila de encaixe');
+      }
     }
-        , [])
-
-    const getData = async () => {
-        setLoading(true)
-        const url = `https://encaixe-back.herokuapp.com/clients/`
-        const req = await fetch(url, {
-            method: 'GET',
-            headers: {'Content-Type': 'application/json'}
-        })
-        const json = await req.json();
-        if(json.type === 'Error'){
-            Alert.alert('Erro', json.message)
-            setData([])
-            setFilterData([])
-        } else{
-            setData(json)
-            setFilterData(json)
-        }
-        setLoading(false)
-    }
-
-    const searchFilter = (text) => {
-        if (text){
-            const newData = data.filter((item)=>{
-                const itemData = item.number ? item.number.toUpperCase() : ''.toLocaleUpperCase()
-                return itemData.indexOf(text) > -1;
-            })
-            setFilterData(newData)
-            setSearch(text)
-        } else {
-            setFilterData(data)
-            setSearch(text)
-        }
-    }
-
-
     return (
-    <SafeAreaView style={{flex: 1}}>
-        <View >
-            <TextInput 
-            placeholder="Pesquisar por número"
-            style={{}}  
-            value={search}   
-            onChangeText={(t)=>searchFilter(t)}       
-            underlineColorAndroid='transparent'
-            />
-            <FlatList 
-                data={filterData}
-                keyExtractor={item=>item.id}
-                renderItem={({item})=><ItemList data={item} refresh={()=>getData()} />}
-
-            />
-
-        </View>
-
-        
-    </SafeAreaView>
+    <BackGroundView>
+        <InsertForms postClient={postClient} name="" number='' morning={true} afternoon={true} tuesday={true} wednesday={true} thursday={true} friday={true} saturday={true} start={todayDate} end={todayDate}/>
+    </BackGroundView>
 )}
 
 export default EditScreen

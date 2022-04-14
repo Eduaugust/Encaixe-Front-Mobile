@@ -23,7 +23,6 @@ const InsertScreen = () => {
 
 
     const postClient = async (submitSet) => {
-        console.log(submitSet)
         const req = await fetch('https://encaixe-back.herokuapp.com/clients', {
         method: 'POST',
         body: JSON.stringify(submitSet),

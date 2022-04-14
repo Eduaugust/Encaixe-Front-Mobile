@@ -1,7 +1,7 @@
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Icon from 'react-native-vector-icons/Ionicons';
-import EditScreen from '../pages/EditScreen';
+import EditStack from './EditStack';
 import InsertScreen from '../pages/InsertScreen';
 import SearchScreen from '../pages/SearchScreen';
 
@@ -11,6 +11,7 @@ const MainTab = () => {
     return (
         <Tab.Navigator
         screenOptions={({route})=>({
+            tabBarHideOnKeyboard: true,
             tabBarLabel: '',
             tabBarIcon: ( {focused, color, size} ) => {
                 let iconName = null;
@@ -18,8 +19,8 @@ const MainTab = () => {
                     case 'Search':
                         iconName = 'ios-search'
                         break;
-                    case 'Edit':
-                        iconName = 'ios-pencil'
+                    case 'EditScreen':
+                        iconName = 'ios-eye'
                         break;
                     case 'Insert':
                         iconName = 'ios-add'
@@ -31,7 +32,7 @@ const MainTab = () => {
         >
             <Tab.Screen name='Search' component={SearchScreen} options={{title: 'Consultar'}}/>
             <Tab.Screen name='Insert' component={InsertScreen} options={{title: 'Inserir'}}/>
-            <Tab.Screen name='Edit' component={EditScreen} options={{title: 'Editar'}}/>
+            <Tab.Screen name='EditScreen' component={EditStack} options={{headerShown:false}}  />
         </Tab.Navigator>
     );
 }
