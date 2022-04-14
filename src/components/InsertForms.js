@@ -6,8 +6,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 
 
-const InsertForms = () => {
-    const todayDate = formatDateToDb(new Date())
+const InsertForms = (props) => {
     const RegExp = /\+\d{2}\s\(\d{2}\)\s\d{4,5}-?\d{4}/g;
 
     function mTel(tel) {
@@ -29,13 +28,7 @@ const InsertForms = () => {
       }
       return tel;
   }
-  function formatDateToDb(date) {
-    let dateObj = date
-    let month = dateObj.getUTCMonth() + 1; //months from 1-12
-    let day = dateObj.getUTCDate();
-    let year = dateObj.getUTCFullYear();
-    return year + "-" + month.pad() + "-" + day.pad();
-  }
+  
   const clearForm = () => {
     setName('')
     setNumber('')
@@ -49,18 +42,18 @@ const InsertForms = () => {
     setSaturday(true)
   }
     
-    const [name, setName] = useState('')
-    const [number, setNumber] = useState('')
-    const [service, setService] = useState('')
-    const [start, setStart] = useState(todayDate)
-    const [end, setEnd] = useState(todayDate)
-    const [morning, setMorning] = useState(true)
-    const [afternoon, setAfternoon] = useState(true)
-    const [tuesday, setTuesday] = useState(true)
-    const [wednesday, setWednesday] = useState(true)
-    const [thursday, setThursday] = useState(true)
-    const [friday, setFriday] = useState(true)
-    const [saturday, setSaturday] = useState(true)
+    const [name, setName] = useState(props.name)
+    const [number, setNumber] = useState(props.number)
+    const [service, setService] = useState(props.service)
+    const [start, setStart] = useState(props.start)
+    const [end, setEnd] = useState(props.end)
+    const [morning, setMorning] = useState(props.morning)
+    const [afternoon, setAfternoon] = useState(props.afternoon)
+    const [tuesday, setTuesday] = useState(props.tuesday)
+    const [wednesday, setWednesday] = useState(props.wednesday)
+    const [thursday, setThursday] = useState(props.thursday)
+    const [friday, setFriday] = useState(props.friday)
+    const [saturday, setSaturday] = useState(props.saturday)
 
 
   
@@ -81,18 +74,8 @@ const InsertForms = () => {
         name, number, service, start, end, morning, afternoon, tuesday, wednesday, thursday, friday, saturday, 'userId': 1
       }
 
-      const req = await fetch('https://encaixe-back.herokuapp.com/clients', {
-        method: 'POST',
-        body: JSON.stringify(submitSet),
-        headers: {'Content-Type': 'application/json'}
-      })
-      const json = await req.json();
-      if(json.type === 'Error'){
-        Alert.alert('Erro', json.message)
-      } else{
-        Alert.alert('Concluído!', 'Cliente encaixada com sucesso!');
-        clearForm();
-      }
+      await props.postClient(submitSet)
+      // clearForm();
 
     } catch (e) {
       Alert.alert('Erro', e.message)
@@ -125,8 +108,8 @@ const InsertForms = () => {
 
             {/* Data - Início / Fim */}
             <View style={styles.containerRow}>
-                <SelectDay label={'Ínicio'} setName={setStart} is_start={true} />
-                <SelectDay label={'Fim'} setName={setEnd} is_start={false} />
+                <SelectDay label={'Ínicio'} setName={setStart} />
+                <SelectDay label={'Fim'} setName={setEnd} />
             </View>
 
             {/* Dias da semana */}
@@ -164,7 +147,7 @@ const TextField = ({ label, value, ...inputProps }) => (
     </View>
   )
 
-  const SelectDay = ({ label, setName, is_start }) => (
+  const SelectDay = ({ label, setName }) => (
     <View style={styles.containerText}>
       <Text style={styles.label}>{label}</Text>
       <DatePicker
@@ -188,7 +171,7 @@ const TextField = ({ label, value, ...inputProps }) => (
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor:'rgba(250,140,130,0.5)',
+        backgroundColor:'pink',
         padding: 2,
         alignItems: 'center',
         justifyContent: 'center',
@@ -213,7 +196,7 @@ const styles = StyleSheet.create({
     },
     input:{
         padding:3,
-        backgroundColor:'rgba(250,140,130,1)',
+        backgroundColor:'white',
         borderRadius: 5,
     },
 })

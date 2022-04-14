@@ -3,9 +3,7 @@ import styled from 'styled-components/native'
 import ItemList from '../components/itemList'
 import DatePicker from '../components/datePicker';
 import { Text, View, ActivityIndicator, Alert } from 'react-native'
-
-
-
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const BackGroundView = styled.View`
     flex: 1;
@@ -31,30 +29,33 @@ const HomeScreen = () => {
 
 
     useEffect(() => {
-        const getData = async () => {
-            setLoading(true)
-            const req = await fetch(`https://encaixe-back.herokuapp.com/clients/${date}` , {
-                method: 'GET',
-            })
-            const json = await req.json();
-            if(json.type === 'Error'){
-                Alert.alert('Erro', json.message)
-                setData([])
-            } else{
-                setData(json)
-            }
-            setLoading(false)
-
-        }
         getData()
     }
         , [date])
+
+    const getData = async () => {
+        setLoading(true)
+        const req = await fetch(`https://encaixe-back.herokuapp.com/clients/${date}` , {
+            method: 'GET',
+        })
+        const json = await req.json();
+        if(json.type === 'Error'){
+            Alert.alert('Erro', json.message)
+            setData([])
+        } else{
+            setData(json)
+        }
+        setLoading(false)
+    }
 
     
     
     return (
     <BackGroundView>
-        <DatePicker passDate={(d)=>{setDate(d)} } />
+        <View style={{flexDirection: 'row'}}>
+            <DatePicker passDate={(d)=>{setDate(d)} } />
+            <Icon.Button  name="ios-refresh"  color='pink' size={18} backgroundColor='transparent' onPress={()=>{getData()}} />
+        </View>
         {loading && 
         <View style={{alignItems: 'center', flex:1, justifyContent: 'center', backgroundColor:'transparent', width:'100%', paddingBottom:80}}>
           <ActivityIndicator size="large" color='black'/>
@@ -65,7 +66,7 @@ const HomeScreen = () => {
         <List
         data={data}
         keyExtractor={item=>item.id}
-        renderItem={({item})=><ItemList data={item} />}
+        renderItem={({item})=><ItemList data={item} refresh={()=>getData()} />}
         />
       }
         
