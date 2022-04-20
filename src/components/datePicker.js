@@ -47,9 +47,8 @@ const datePicker = ({passDate, value}) => {
 
     return (
         <>
-        {!open &&
         <Show color={'rgba(0,0,0,0.8)'} title={reverseStr(date)} onPress={()=>{setOpen(true);}} />
-        }
+
         {open &&
         <Modal animationType="slide">
             <ViewModal>

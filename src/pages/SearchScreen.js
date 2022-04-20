@@ -2,9 +2,10 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native'
 import ItemList from '../components/itemList'
 import DatePicker from '../components/datePicker';
-import { Text, View, ActivityIndicator, Alert, Linking } from 'react-native'
+import { Text, View, ActivityIndicator, Linking } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useIsFocused  } from '@react-navigation/native';
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 const BackGroundView = styled.View`
     zIndex:1;
@@ -26,7 +27,11 @@ const HomeScreen = () => {
 
     const [date, setDate] = useState(formatDateToDb(new Date()))
     const [data, setData] = useState([]);
+    const [alertMessage, setAlertMessage] = useState('')
+    const [alertTitle, setAlertTitle] = useState('')
+    const [showAlert, setShowAlert] = useState(false)
     const [ loading, setLoading ] = useState(true);
+    const [idClient, setIdClient] = useState()
 
     const isFocused = useIsFocused();
     useEffect(() => {
@@ -41,7 +46,9 @@ const HomeScreen = () => {
         })
         const json = await req.json();
         if(json.type === 'Error'){
-            Alert.alert('Erro', json.message)
+            setAlertTitle('Erro')
+            setAlertMessage(json.message)
+            setShowAlert(true)
             setData([])
         } else{
             setData(json)
@@ -73,30 +80,48 @@ const HomeScreen = () => {
             getData()
             setLoading(false)
         }
-        Alert.alert(
-            "Aviso",
-            "Exluir permanentemente a cliente:\nNome: " + data.name + '\nNum: ' + data.number,
-            [
-              {text: "Cancelar",style: "default" },
-              { text: "Exluir", onPress: async () => {await del(data.id)}, style: "destructive" }
-            ]
-          );
+        setAlertTitle('Aviso')
+        setAlertMessage("Exluir permanentemente a cliente:\nNome: " + data.name + '\nNum: ' + data.number)
+        setIdClient(0)
+        setShowAlert(true)        
     }
 
     return (
         <>
-        {loading && 
+        <AwesomeAlert
+          show={showAlert}
+          title={alertTitle}
+          message={alertMessage}
+          closeOnTouchOutside={true}
+          closeOnHardwareBackPress={true}
+          showCancelButton={idClient != 0}
+          showConfirmButton={true}
+          cancelText="Cancelar"
+          confirmText="Confirmar"
+          confirmButtonColor="#DD6B55"
+          onCancelPressed={() => {
+            setShowAlert(false)
+            setIdClient(0)
+          }}
+          onConfirmPressed={() => {
+              console.log(123)
+            needDeleteClient ? async () => {await del(data.id)} : 1
+            setShowAlert(false); 
+
+          }}
+        />
+        {loading && !showAlert &&
             <View style={{zIndex:333, elevation:333,alignItems: 'center', flex:1, justifyContent: 'center', backgroundColor:'rgba(250,250,250,0.1)', width:'100%', height:'100%'}}>
               <ActivityIndicator size="large" color='black'/>
               <Text style={{color: 'black', fontSize:18}}>Carregando</Text>
             </View>
           }
-    {!loading && 
+    {!loading && !showAlert && 
     <BackGroundView>
         
         <View style={{flexDirection: 'row'}}>
             <DatePicker passDate={(newDate)=>{setDate(newDate);}} value={date} />
-            <Icon.Button  name="ios-refresh"  color='black' size={18} backgroundColor='transparent' onPress={()=>{getData()}} />
+            <Icon  name="ios-refresh"  color='black' size={18} backgroundColor='transparent' onPress={()=>{getData()}} />
         </View>
         
       

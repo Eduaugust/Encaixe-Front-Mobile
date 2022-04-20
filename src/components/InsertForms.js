@@ -128,7 +128,7 @@ const InsertForms = (props) => {
             {/* Enviar */}
             <View style={styles.containerRow}>
                 <Button onPress={handleSubmit} title={'Enviar'} style={{marginHorizontal: 30}} color='rgba(0,0,0,0.8)' />
-                <Icon.Button  name="ios-refresh"  color='black' size={18} backgroundColor='transparent' onPress={clearForm} style={{marginHorizontal: 30}} />
+                <Icon  name="ios-refresh"  color='black' size={18} backgroundColor='transparent' onPress={clearForm} style={{marginHorizontal: 30}} />
             </View>
         </View>
     )

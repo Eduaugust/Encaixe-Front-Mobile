@@ -33,7 +33,7 @@ const ItemList = ({data, icon, funcWhoCalled, deleteClient}) => {
             </View>
 
             <>
-            <Icon.Button  name={`ios-${icon}`}  color='white' size={18} backgroundColor='transparent' onPress={()=>{funcWhoCalled(data);}} />
+            <Icon  name={`ios-${icon}`}  color='white' size={18} backgroundColor='transparent' onPress={()=>{funcWhoCalled(data);}} />
             <Icon.Button  name="trash"  color='white' size={18} backgroundColor='transparent' onPress={()=>{deleteClient(data)}} />
             </>
         </Item>
