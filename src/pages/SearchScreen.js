@@ -4,8 +4,11 @@ import ItemList from '../components/itemList'
 import DatePicker from '../components/datePicker';
 import { Text, View, ActivityIndicator, Alert, Linking } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useIsFocused  } from '@react-navigation/native';
 
 const BackGroundView = styled.View`
+    zIndex:1;
+    elevation:1;
     flex: 1;
     alignItems: center;
     justifyContent: flex-start;
@@ -20,18 +23,16 @@ const List = styled.FlatList`
 `;
 
 const HomeScreen = () => {
-    const todayDate = formatDateToDb(new Date())
 
-    const [date, setDate] = useState(todayDate);
-
+    const [date, setDate] = useState(formatDateToDb(new Date()))
     const [data, setData] = useState([]);
     const [ loading, setLoading ] = useState(true);
 
-
+    const isFocused = useIsFocused();
     useEffect(() => {
-        getData()
+        isFocused ? getData(): null
     }
-    , [date])
+    , [date, isFocused])
 
     const getData = async () => {
         setLoading(true)
@@ -59,31 +60,55 @@ const HomeScreen = () => {
         });
     }
 
-    
-    
+    const DeleteClient = (data) => {
+        const del = async (id) => {
+            setLoading(true)
+            const req = await fetch(`https://encaixe-back.herokuapp.com/clients/${id}` , {method: 'DELETE'})
+            const json = await req.json()
+            if(json.type === 'Error'){
+                Alert.alert('Erro', 'Algum erro ocorreu ao deletar a cliente')
+            } else{
+                Alert.alert('Success', 'Cliente deletado com sucesso')
+            }
+            getData()
+            setLoading(false)
+        }
+        Alert.alert(
+            "Aviso",
+            "Exluir permanentemente a cliente:\nNome: " + data.name + '\nNum: ' + data.number,
+            [
+              {text: "Cancelar",style: "default" },
+              { text: "Exluir", onPress: async () => {await del(data.id)}, style: "destructive" }
+            ]
+          );
+    }
+
     return (
-    <BackGroundView>
-        <View style={{flexDirection: 'row'}}>
-            <DatePicker passDate={(d)=>{setDate(d)} } />
-            <Icon.Button  name="ios-refresh"  color='pink' size={18} backgroundColor='transparent' onPress={()=>{getData()}} />
-        </View>
+        <>
         {loading && 
-        <View style={{alignItems: 'center', flex:1, justifyContent: 'center', backgroundColor:'transparent', width:'100%', paddingBottom:80}}>
-          <ActivityIndicator size="large" color='black'/>
-          <Text style={{color: 'black', fontSize:18}}>Carregando</Text>
+            <View style={{zIndex:333, elevation:333,alignItems: 'center', flex:1, justifyContent: 'center', backgroundColor:'rgba(250,250,250,0.1)', width:'100%', height:'100%'}}>
+              <ActivityIndicator size="large" color='black'/>
+              <Text style={{color: 'black', fontSize:18}}>Carregando</Text>
+            </View>
+          }
+    {!loading && 
+    <BackGroundView>
+        
+        <View style={{flexDirection: 'row'}}>
+            <DatePicker passDate={(newDate)=>{setDate(newDate);}} value={date} />
+            <Icon.Button  name="ios-refresh"  color='black' size={18} backgroundColor='transparent' onPress={()=>{getData()}} />
         </View>
-      }
-      {!loading && 
+        
+      
         <List
         data={data}
         keyExtractor={item=>item.id}
-        renderItem={({item})=><ItemList data={item} refresh={()=>getData()} icon='logo-whatsapp' funcWhoCalled={(data)=>{OpenWhats(data)}} />}
+        renderItem={({item})=><ItemList data={item} deleteClient={(data)=>DeleteClient(data)} icon='logo-whatsapp' funcWhoCalled={(data)=>{OpenWhats(data)}} />}
         />
-      }
-        
-
-        
     </BackGroundView>
+      }
+
+    </>
 )}
 
 Number.prototype.pad = function(size) {
@@ -92,12 +117,13 @@ Number.prototype.pad = function(size) {
     return s;
 }
 
-function formatDateToDb(date) {
+const formatDateToDb = (date) => {
     let dateObj = date
     let month = dateObj.getUTCMonth() + 1; //months from 1-12
     let day = dateObj.getUTCDate();
     let year = dateObj.getUTCFullYear();
-    return year + "-" + month.pad() + "-" + day.pad();
+    const returnDate = year + "-" + month.pad() + "-" + day.pad();
+    return returnDate
 }
 
 export default HomeScreen

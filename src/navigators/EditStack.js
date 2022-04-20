@@ -8,7 +8,7 @@ const EditStack = createStackNavigator();
 
 export default () => (
         <EditStack.Navigator>
-            <EditStack.Screen name="Show" component={ShowAllScreen} options={{name: 'Vizualizar'}} />
-            <EditStack.Screen name="Edit" component={EditScreen} options={{name: 'Editar'}} />
+            <EditStack.Screen name="Show" component={ShowAllScreen} options={{title: 'Vizualizar'}} />
+            <EditStack.Screen name="Edit" component={EditScreen} options={{title: 'Editar'}} />
         </EditStack.Navigator>
     )

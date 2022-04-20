@@ -19,30 +19,7 @@ const ItemText = styled.Text`
     margin:5px;
 `;
 
-const ItemList = ({data, refresh, icon, funcWhoCalled}) => {
-
-    const DeleteClient = () => {
-        const del = async (id) => {
-            const req = await fetch(`https://encaixe-back.herokuapp.com/clients/${id}` , {method: 'DELETE'})
-            const json = await req.json()
-            if(json.type === 'Error'){
-                Alert.alert('Erro', 'Algum erro ocorreu ao deletar a cliente')
-            } else{
-                Alert.alert('Success', 'Cliente deletado com sucesso')
-                refresh()
-            }
-        }
-        Alert.alert(
-            "Aviso",
-            "Exluir permanentemente a cliente:\nNome: " + data.name + '\nNum: ' + data.number,
-            [
-              {text: "Cancelar",style: "default"},
-              { text: "Exluir", onPress: async () => await del(data.id), style: "destructive" }
-            ]
-          );
-    }
-
-    
+const ItemList = ({data, icon, funcWhoCalled, deleteClient}) => {    
     return (
         <Item  onPress={()=>{}}>
             <ItemText>{data.name}</ItemText>
@@ -56,8 +33,8 @@ const ItemList = ({data, refresh, icon, funcWhoCalled}) => {
             </View>
 
             <>
-            <Icon.Button  name={`ios-${icon}`}  color='white' size={18} backgroundColor='transparent' onPress={()=>{funcWhoCalled(data)}} />
-            <Icon.Button  name="trash"  color='white' size={18} backgroundColor='transparent' onPress={()=>{DeleteClient()}} />
+            <Icon.Button  name={`ios-${icon}`}  color='white' size={18} backgroundColor='transparent' onPress={()=>{funcWhoCalled(data);}} />
+            <Icon.Button  name="trash"  color='white' size={18} backgroundColor='transparent' onPress={()=>{deleteClient(data)}} />
             </>
         </Item>
 

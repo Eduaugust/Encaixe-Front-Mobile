@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import {View, Text, TextInput, StyleSheet, Button, Alert} from 'react-native'
 import DatePicker from './datePicker'
-import CheckBox from '@react-native-community/checkbox';
+import CheckBox from './checkbox';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 
@@ -75,7 +75,7 @@ const InsertForms = (props) => {
       }
 
       await props.postClient(submitSet)
-      // clearForm();
+      clearForm();
 
     } catch (e) {
       Alert.alert('Erro', e.message)
@@ -89,27 +89,25 @@ const InsertForms = (props) => {
           {/* Nome/ número */}
             <View style={styles.containerRow}>
                 <TextField label={'Nome'} placeholder={'Digite um nome'} onChangeText={t=>setName(t)} value={name} />
-                <TextField label={'Número'} placeholder={'+55(99)99999-9999'} onChangeText={t=>setNumber(mTel(t))} value={number} />
+                <TextField label={'Número'} placeholder={'+55(99)99999-9999'} onChangeText={t=>setNumber(mTel(t))} value={number} keyboardType='numeric' />
             </View>
 
             {/* Serviço / Período */}
             <View style={styles.containerRow}>
                 <TextField label={'Serviço'} placeholder={'Digite o serviço'} onChangeText={t=>setService(t)} value={service} />
-                
+
                 <View style={styles.containerText}>
                   <Text style={styles.label}>{'Período'}</Text>
-
                   <ChoiceCheckBox label={'Manhã'} name={morning} setName={setMorning} style={styles.containerRow} />
                   <ChoiceCheckBox label={'Tarde'} name={afternoon} setName={setAfternoon} style={styles.containerRow} />
-
                 </View>
                 
             </View>
 
             {/* Data - Início / Fim */}
             <View style={styles.containerRow}>
-                <SelectDay label={'Ínicio'} setName={setStart} />
-                <SelectDay label={'Fim'} setName={setEnd} />
+                <SelectDay label={'Ínicio'} name={start} setName={setStart} />
+                <SelectDay label={'Fim'} name={end} setName={setEnd} />
             </View>
 
             {/* Dias da semana */}
@@ -129,8 +127,8 @@ const InsertForms = (props) => {
 
             {/* Enviar */}
             <View style={styles.containerRow}>
-                <Button onPress={handleSubmit} title={'Adicionar na lista'} style={{marginHorizontal: 30}} />
-                <Icon.Button  name="ios-refresh"  color='white' size={18} backgroundColor='transparent' onPress={clearForm} style={{marginHorizontal: 30}} />
+                <Button onPress={handleSubmit} title={'Enviar'} style={{marginHorizontal: 30}} color='rgba(0,0,0,0.8)' />
+                <Icon.Button  name="ios-refresh"  color='black' size={18} backgroundColor='transparent' onPress={clearForm} style={{marginHorizontal: 30}} />
             </View>
         </View>
     )
@@ -147,12 +145,13 @@ const TextField = ({ label, value, ...inputProps }) => (
     </View>
   )
 
-  const SelectDay = ({ label, setName }) => (
+  const SelectDay = ({ label, setName, name }) => (
     <View style={styles.containerText}>
       <Text style={styles.label}>{label}</Text>
       <DatePicker
         passDate={(data)=>{setName(data);}}
         style={styles.input}
+        value={name}
       />
     </View>
   )
@@ -160,7 +159,6 @@ const TextField = ({ label, value, ...inputProps }) => (
   const ChoiceCheckBox = ({ name, label, setName, style }) => (
     <View style={style}>
       <CheckBox
-        disabled={false}
         value={name}
         onValueChange={(newValue) => setName(newValue)}
       />
@@ -195,6 +193,7 @@ const styles = StyleSheet.create({
         fontSize:22,
     },
     input:{
+        flex:1,
         padding:3,
         backgroundColor:'white',
         borderRadius: 5,

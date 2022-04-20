@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import {View, SafeAreaView, FlatList, TextInput, StyleSheet} from 'react-native'
+import {View, SafeAreaView, FlatList, TextInput, StyleSheet, ActivityIndicator, Text, Alert} from 'react-native'
 import ItemList from '../components/itemList'
-
+import { useIsFocused  } from '@react-navigation/native';
 
 
 const ShowAllScreen = ({ navigation }) => {
@@ -10,11 +10,12 @@ const ShowAllScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(false)
     const [data, setData] = useState([])
     const [filterData, setFilterData] = useState([])
+    const isFocused = useIsFocused();
 
     useEffect(() => {
-        getData()
+        isFocused ? getData(): null
     }
-        , [])
+        , [isFocused])
 
     const getData = async () => {
         setLoading(true)
@@ -49,9 +50,40 @@ const ShowAllScreen = ({ navigation }) => {
         }
     }
 
+    const DeleteClient = (data) => {
+        const del = async (id) => {
+            setLoading(true)
+            const req = await fetch(`https://encaixe-back.herokuapp.com/clients/${id}` , {method: 'DELETE'})
+            const json = await req.json()
+            if(json.type === 'Error'){
+                Alert.alert('Erro', 'Algum erro ocorreu ao deletar a cliente')
+            } else{
+                Alert.alert('Success', 'Cliente deletado com sucesso')
+            }
+            getData()
+            setLoading(false)
+        }
+        Alert.alert(
+            "Aviso",
+            "Exluir permanentemente a cliente:\nNome: " + data.name + '\nNum: ' + data.number,
+            [
+              {text: "Cancelar",style: "default" },
+              { text: "Exluir", onPress: async () => {await del(data.id)}, style: "destructive" }
+            ]
+          );
+    }
+
+
 
     return (
     <SafeAreaView style={{flex: 1}}>
+      {loading && 
+        <View style={{zIndex:3, elevation:3,alignItems: 'center', flex:1, justifyContent: 'center', backgroundColor:'#CCC', width:'100%', height:'100%'}}>
+          <ActivityIndicator size="large" color='black'/>
+          <Text style={{color: 'black', fontSize:18}}>Carregando</Text>
+        </View>
+      }
+    {!loading && 
         <View >
             <TextInput 
             placeholder="Pesquisar por número"
@@ -62,15 +94,15 @@ const ShowAllScreen = ({ navigation }) => {
             keyboardType='phone-pad'
             />
             <FlatList 
+                style={styles.list}
                 data={filterData}
                 keyExtractor={item=>item.id}
-                renderItem={({item})=><ItemList data={item} refresh={()=>getData()} icon='pencil' funcWhoCalled={()=>navigation.navigate('Edit')} />}
+                renderItem={({item})=><ItemList data={item} deleteClient={(data)=>{DeleteClient(data)}} icon='pencil' funcWhoCalled={()=>navigation.navigate('Edit', {item})} />}
 
             />
 
         </View>
-
-        
+    }
     </SafeAreaView>
 )}
 
@@ -81,6 +113,10 @@ const styles = StyleSheet.create({
         margin: 5,
         backgroundColor: '#DDD',
         borderRadius: 5
+    },
+    list: {
+        margin: 5,
+        marginBottom: 50
     }
 })
 
