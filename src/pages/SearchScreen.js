@@ -3,7 +3,6 @@ import styled from 'styled-components/native'
 import ItemList from '../components/itemList'
 import DatePicker from '../components/datePicker';
 import { Text, View, ActivityIndicator, Linking } from 'react-native'
-import Icon from 'react-native-vector-icons/Ionicons';
 import { useIsFocused  } from '@react-navigation/native';
 import AwesomeAlert from 'react-native-awesome-alerts';
 
@@ -35,7 +34,10 @@ const HomeScreen = () => {
 
     const isFocused = useIsFocused();
     useEffect(() => {
-        isFocused ? getData(): null
+        isFocused ? getData(): 1
+        return () => {
+              // This is the cleanup function
+            }
     }
     , [date, isFocused])
 
@@ -67,33 +69,60 @@ const HomeScreen = () => {
         });
     }
 
-    const DeleteClient = (data) => {
-        const del = async (id) => {
-            setLoading(true)
-            const req = await fetch(`https://encaixe-back.herokuapp.com/clients/${id}` , {method: 'DELETE'})
-            const json = await req.json()
-            if(json.type === 'Error'){
-                Alert.alert('Erro', 'Algum erro ocorreu ao deletar a cliente')
-            } else{
-                Alert.alert('Success', 'Cliente deletado com sucesso')
-            }
-            getData()
-            setLoading(false)
+    const del = async () => {
+        setLoading(true)
+        const req = await fetch(`https://encaixe-back.herokuapp.com/clients/${idClient}` , {method: 'DELETE'})
+        const json = await req.json()
+        if(json.type === 'Error'){
+            setAlertTitle('Error')
+            setAlertMessage('Algum erro ocorreu ao deletar a cliente. \n'+json.message)
+        } else{
+            setAlertTitle('Sucesso')
+            setAlertMessage('Cliente deletada com sucesso')
         }
+        await getData()
+        setLoading(false)
+        setShowAlert(true)     
+    }
+
+    const DeleteClient = (data) => {
         setAlertTitle('Aviso')
         setAlertMessage("Exluir permanentemente a cliente:\nNome: " + data.name + '\nNum: ' + data.number)
-        setIdClient(0)
+        setIdClient(data.id)
         setShowAlert(true)        
     }
 
     return (
         <>
-        <AwesomeAlert
+    {/* Tela de carregamento */}
+    {loading && 
+        <View style={{zIndex:333, elevation:333,alignItems: 'center', flex:1, justifyContent: 'center', backgroundColor:'rgba(250,250,250,0.1)', width:'100%', height:'100%'}}>
+            <ActivityIndicator size="large" color='black'/>
+            <Text style={{color: 'black', fontSize:18}}>Carregando</Text>
+        </View>
+    }
+    {/* DatePicker e Lista */}
+    {!loading && !showAlert && 
+    <BackGroundView>
+        <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+            <DatePicker passDate={(newDate)=>{setDate(newDate);}} value={date} />
+        </View>
+        
+        <List
+        data={data}
+        keyExtractor={item=>item.id}
+        renderItem={({item})=><ItemList data={item} deleteClient={(data)=>DeleteClient(data)} icon='logo-whatsapp' funcWhoCalled={(data)=>{OpenWhats(data)}} />}
+        />
+    </BackGroundView>
+      }
+      {/* Alerta de delete */}
+      {!loading && showAlert &&
+      <AwesomeAlert
           show={showAlert}
           title={alertTitle}
           message={alertMessage}
-          closeOnTouchOutside={true}
-          closeOnHardwareBackPress={true}
+          closeOnTouchOutside={false}
+          closeOnHardwareBackPress={false}
           showCancelButton={idClient != 0}
           showConfirmButton={true}
           cancelText="Cancelar"
@@ -103,35 +132,14 @@ const HomeScreen = () => {
             setShowAlert(false)
             setIdClient(0)
           }}
-          onConfirmPressed={() => {
-              console.log(123)
-            needDeleteClient ? async () => {await del(data.id)} : 1
-            setShowAlert(false); 
-
+          onConfirmPressed={async () => {
+              if(idClient != 0){
+                await del()
+              } 
+              setShowAlert(false); 
+              setIdClient(0)
           }}
-        />
-        {loading && !showAlert &&
-            <View style={{zIndex:333, elevation:333,alignItems: 'center', flex:1, justifyContent: 'center', backgroundColor:'rgba(250,250,250,0.1)', width:'100%', height:'100%'}}>
-              <ActivityIndicator size="large" color='black'/>
-              <Text style={{color: 'black', fontSize:18}}>Carregando</Text>
-            </View>
-          }
-    {!loading && !showAlert && 
-    <BackGroundView>
-        
-        <View style={{flexDirection: 'row'}}>
-            <DatePicker passDate={(newDate)=>{setDate(newDate);}} value={date} />
-            <Icon  name="ios-refresh"  color='black' size={18} backgroundColor='transparent' onPress={()=>{getData()}} />
-        </View>
-        
-      
-        <List
-        data={data}
-        keyExtractor={item=>item.id}
-        renderItem={({item})=><ItemList data={item} deleteClient={(data)=>DeleteClient(data)} icon='logo-whatsapp' funcWhoCalled={(data)=>{OpenWhats(data)}} />}
-        />
-    </BackGroundView>
-      }
+        />}
 
     </>
 )}

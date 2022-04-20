@@ -23,7 +23,7 @@ const ItemList = ({data, icon, funcWhoCalled, deleteClient}) => {
     return (
         <Item  onPress={()=>{}}>
             <ItemText>{data.name}</ItemText>
-            <ItemText>{data.number.slice(7)}</ItemText>
+            <ItemText>{data.number.slice(3)}</ItemText>
             <ItemText>{data.service}</ItemText>
             <View style={{flexDirection: 'column', alignItems: 'center'}}>
                 {data.morning &&

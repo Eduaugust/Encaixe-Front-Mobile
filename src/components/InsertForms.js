@@ -1,5 +1,5 @@
-import React, {useState} from 'react'
-import {View, Text, TextInput, StyleSheet, Button, Alert} from 'react-native'
+import React, {useState, useEffect} from 'react'
+import {View, Text, TextInput, StyleSheet, Button} from 'react-native'
 import DatePicker from './datePicker'
 import CheckBox from './checkbox';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 
 const InsertForms = (props) => {
+
     const RegExp = /\+\d{2}\s\(\d{2}\)\s\d{4,5}-?\d{4}/g;
 
     function mTel(tel) {
@@ -54,7 +55,12 @@ const InsertForms = (props) => {
     const [thursday, setThursday] = useState(props.thursday)
     const [friday, setFriday] = useState(props.friday)
     const [saturday, setSaturday] = useState(props.saturday)
-
+    
+    useEffect(() => {
+      return () => {
+        // This is the cleanup function
+      }
+    }, []);
 
   
 
@@ -78,7 +84,7 @@ const InsertForms = (props) => {
       clearForm();
 
     } catch (e) {
-      Alert.alert('Erro', e.message)
+      alert(e.message)
     }
   }
 

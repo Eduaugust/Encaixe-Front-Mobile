@@ -26,7 +26,7 @@ const MainTab = () => {
                         iconName = 'ios-add'
                         break;
                 }
-                return <Icon name={iconName} size={size} color={color} />;
+                return <Icon name={iconName} size={30} color={color} />;
             }
         })}
         >

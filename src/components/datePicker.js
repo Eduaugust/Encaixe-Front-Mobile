@@ -38,7 +38,6 @@ const datePicker = ({passDate, value}) => {
         }
     }
     typeof value === "object" ? value = formatDateToDb(value): 1
-    console.log(value)
     const [date, setDate] = useState(value);
     const [open, setOpen] = useState(false);
 

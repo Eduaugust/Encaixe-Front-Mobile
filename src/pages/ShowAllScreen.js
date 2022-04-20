@@ -84,7 +84,7 @@ const ShowAllScreen = ({ navigation }) => {
         </View>
       }
     {!loading && 
-        <View >
+    <>
             <TextInput 
             placeholder="Pesquisar por número"
             style={styles.searchBar}  
@@ -93,6 +93,7 @@ const ShowAllScreen = ({ navigation }) => {
             underlineColorAndroid='transparent'
             keyboardType='phone-pad'
             />
+        <View style={{zIndex:1, elevation:1, flex: 1, alignItems: 'center', justifyContent: 'flex-start', padding: 10}}>
             <FlatList 
                 style={styles.list}
                 data={filterData}
@@ -102,6 +103,7 @@ const ShowAllScreen = ({ navigation }) => {
             />
 
         </View>
+        </>
     }
     </SafeAreaView>
 )}
@@ -115,8 +117,10 @@ const styles = StyleSheet.create({
         borderRadius: 5
     },
     list: {
-        margin: 5,
-        marginBottom: 50
+        flex: 1,
+        height:100,
+        width:'80%',
+        margin:10,
     }
 })
 

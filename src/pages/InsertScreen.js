@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import styled from 'styled-components/native'
 import InsertForms from '../components/InsertForms'
-import { Text, View, ActivityIndicator, Alert, Linking } from 'react-native'
-
+import { Text, View, ActivityIndicator } from 'react-native'
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 const BackGroundView = styled.View`
     flex: 1;
@@ -13,7 +13,10 @@ const BackGroundView = styled.View`
 const InsertScreen = () => {
   const todayDate = formatDateToDb(new Date())
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)  
+  const [alertMessage, setAlertMessage] = useState('')
+  const [alertTitle, setAlertTitle] = useState('')
+  const [showAlert, setShowAlert] = useState(false)
 
   const postClient = async (submitSet) => {
     setLoading(true);
@@ -24,11 +27,14 @@ const InsertScreen = () => {
     })
     const json = await req.json();
     if(json.type === 'Error'){
-      Alert.alert('Erro', json.message)
+      setAlertTitle('Erro')
+      setAlertMessage(json.message)
     } else{
-      Alert.alert('Concluído!', 'Cliente entrou na fila de encaixe');
+      setAlertTitle('Concluído!')
+      setAlertMessage('Cliente adicionada a fila de encaixe com sucesso!')
     }
     setLoading(false);
+    setShowAlert(true)
   }
   return (
       <>
@@ -38,9 +44,27 @@ const InsertScreen = () => {
           <Text style={{color: 'black', fontSize:18}}>Adicionando</Text>
         </View>
       }
-      {!loading && 
+      {showAlert &&
+        <AwesomeAlert
+            show={showAlert}
+            title={alertTitle}
+            message={alertMessage}
+            closeOnTouchOutside={false}
+            closeOnHardwareBackPress={false}
+            showCancelButton={false}
+            showConfirmButton={true}
+            cancelText="Cancelar"
+            confirmText="Confirmar"
+            confirmButtonColor="#DD6B55"
+
+            onConfirmPressed={() => {
+              setShowAlert(false); 
+            }}
+          />}
+           
+      {!loading && !showAlert &&
     <BackGroundView>
-        <InsertForms postClient={postClient} name="" number='' morning={true} afternoon={true} tuesday={true} wednesday={true} thursday={true} friday={true} saturday={true} start={todayDate} end={todayDate}/>
+        <InsertForms postClient={async (data)=>{postClient(data)}} name="" service='' number='' morning={true} afternoon={true} tuesday={true} wednesday={true} thursday={true} friday={true} saturday={true} start={todayDate} end={todayDate}/>
     </BackGroundView>}
     </>
 )}
