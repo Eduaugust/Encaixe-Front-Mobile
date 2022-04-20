@@ -101,10 +101,12 @@ const InsertForms = (props) => {
             <View style={styles.containerRow}>
                 <TextField label={'Serviço'} placeholder={'Digite o serviço'} onChangeText={t=>setService(t)} value={service} />
 
-                <View style={styles.containerText}>
+                <View style={{flex:1, width: '100%'}}>
                   <Text style={styles.label}>{'Período'}</Text>
-                  <ChoiceCheckBox label={'Manhã'} name={morning} setName={setMorning} style={styles.containerRow} />
-                  <ChoiceCheckBox label={'Tarde'} name={afternoon} setName={setAfternoon} style={styles.containerRow} />
+                  <View style={{flex:1, width: 150, alignItems: 'start', justifyContent: 'center'}}>
+                    <ChoiceCheckBox label={'Manhã'} name={morning} setName={setMorning} style={styles.containerRow} />
+                    <ChoiceCheckBox label={'Tarde'} name={afternoon} setName={setAfternoon} style={styles.containerRow} />
+                  </View>
                 </View>
                 
             </View>
@@ -168,7 +170,7 @@ const TextField = ({ label, value, ...inputProps }) => (
         value={name}
         onValueChange={(newValue) => setName(newValue)}
       />
-      <Text style={{fontSize:16, color:'black'}}>{label}</Text>
+      <Text style={{fontSize:14, color:'black'}}>{label}</Text>
 
     </View>
   )
@@ -206,7 +208,7 @@ const styles = StyleSheet.create({
     },
     button: {
       flex:1,
-      width:120,
+      width:150,
     }
 })
 
