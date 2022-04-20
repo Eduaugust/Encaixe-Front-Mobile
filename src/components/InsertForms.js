@@ -93,11 +93,10 @@ const InsertForms = (props) => {
         <View style={styles.container}>
 
           {/* Nome/ número */}
-            <View style={styles.containerRow}>
+          <View style={styles.containerRow}>
                 <TextField label={'Nome'} placeholder={'Digite um nome'} onChangeText={t=>setName(t)} value={name} />
                 <TextField label={'Número'} placeholder={'+55(99)99999-9999'} onChangeText={t=>setNumber(mTel(t))} value={number} keyboardType='numeric' />
             </View>
-
             {/* Serviço / Período */}
             <View style={styles.containerRow}>
                 <TextField label={'Serviço'} placeholder={'Digite o serviço'} onChangeText={t=>setService(t)} value={service} />
@@ -154,11 +153,12 @@ const TextField = ({ label, value, ...inputProps }) => (
   const SelectDay = ({ label, setName, name }) => (
     <View style={styles.containerText}>
       <Text style={styles.label}>{label}</Text>
-      <DatePicker
-        passDate={(data)=>{setName(data);}}
-        style={styles.input}
-        value={name}
-      />
+      <View style={styles.button}>
+        <DatePicker
+          passDate={(data)=>{setName(data);}}
+          value={name}
+          />
+      </View>
     </View>
   )
 
@@ -204,6 +204,10 @@ const styles = StyleSheet.create({
         backgroundColor:'white',
         borderRadius: 5,
     },
+    button: {
+      flex:1,
+      width:120,
+    }
 })
 
 Number.prototype.pad = function(size) {

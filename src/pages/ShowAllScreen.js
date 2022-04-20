@@ -2,12 +2,17 @@ import React, {useState, useEffect} from 'react';
 import {View, SafeAreaView, FlatList, TextInput, StyleSheet, ActivityIndicator, Text, Alert} from 'react-native'
 import ItemList from '../components/itemList'
 import { useIsFocused  } from '@react-navigation/native';
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 
 const ShowAllScreen = ({ navigation }) => {
 
     const [search, setSearch] = useState('')
-    const [loading, setLoading] = useState(false)
+    const [alertMessage, setAlertMessage] = useState('')
+    const [alertTitle, setAlertTitle] = useState('')
+    const [showAlert, setShowAlert] = useState(false)
+    const [ loading, setLoading ] = useState(true);
+    const [idClient, setIdClient] = useState()
     const [data, setData] = useState([])
     const [filterData, setFilterData] = useState([])
     const isFocused = useIsFocused();
@@ -17,24 +22,24 @@ const ShowAllScreen = ({ navigation }) => {
     }
         , [isFocused])
 
-    const getData = async () => {
-        setLoading(true)
-        const url = `https://encaixe-back.herokuapp.com/clients/`
-        const req = await fetch(url, {
-            method: 'GET',
-            headers: {'Content-Type': 'application/json'}
-        })
-        const json = await req.json();
-        if(json.type === 'Error'){
-            Alert.alert('Erro', json.message)
-            setData([])
-            setFilterData([])
-        } else{
-            setData(json)
-            setFilterData(json)
+        const getData = async () => {
+            setLoading(true)
+            const req = await fetch(`https://encaixe-back.herokuapp.com/clients/` , {
+                method: 'GET',
+            })
+            const json = await req.json();
+            if(json.type === 'Error'){
+                setAlertTitle('Erro')
+                setAlertMessage(json.message)
+                setShowAlert(true)
+                setData([])
+                setFilterData([])
+            } else{
+                setData(json)
+                setFilterData(json)
+            }
+            setLoading(false)
         }
-        setLoading(false)
-    }
 
     const searchFilter = (text) => {
         if (text){
@@ -50,40 +55,66 @@ const ShowAllScreen = ({ navigation }) => {
         }
     }
 
-    const DeleteClient = (data) => {
-        const del = async (id) => {
-            setLoading(true)
-            const req = await fetch(`https://encaixe-back.herokuapp.com/clients/${id}` , {method: 'DELETE'})
-            const json = await req.json()
-            if(json.type === 'Error'){
-                Alert.alert('Erro', 'Algum erro ocorreu ao deletar a cliente')
-            } else{
-                Alert.alert('Success', 'Cliente deletado com sucesso')
-            }
-            getData()
-            setLoading(false)
+    const del = async () => {
+        setLoading(true)
+        const req = await fetch(`https://encaixe-back.herokuapp.com/clients/${idClient}` , {method: 'DELETE'})
+        const json = await req.json()
+        if(json.type === 'Error'){
+            setAlertTitle('Error')
+            setAlertMessage('Algum erro ocorreu ao deletar a cliente. \n'+json.message)
+        } else{
+            setAlertTitle('Sucesso')
+            setAlertMessage('Cliente deletada com sucesso')
         }
-        Alert.alert(
-            "Aviso",
-            "Exluir permanentemente a cliente:\nNome: " + data.name + '\nNum: ' + data.number,
-            [
-              {text: "Cancelar",style: "default" },
-              { text: "Exluir", onPress: async () => {await del(data.id)}, style: "destructive" }
-            ]
-          );
+        await getData()
+        setLoading(false)
+        setShowAlert(true)     
+    }
+
+    const DeleteClient = (data) => {
+        setAlertTitle('Aviso')
+        setAlertMessage("Exluir permanentemente a cliente:\nNome: " + data.name + '\nNum: ' + data.number)
+        setIdClient(data.id)
+        setShowAlert(true)        
     }
 
 
 
     return (
     <SafeAreaView style={{flex: 1}}>
-      {loading && 
-        <View style={{zIndex:3, elevation:3,alignItems: 'center', flex:1, justifyContent: 'center', backgroundColor:'#CCC', width:'100%', height:'100%'}}>
-          <ActivityIndicator size="large" color='black'/>
-          <Text style={{color: 'black', fontSize:18}}>Carregando</Text>
+      {/* Tela de carregamento */}
+    {loading && 
+        <View style={{zIndex:333, elevation:333,alignItems: 'center', flex:1, justifyContent: 'center', backgroundColor:'rgba(250,250,250,0.1)', width:'100%', height:'100%'}}>
+            <ActivityIndicator size="large" color='black'/>
+            <Text style={{color: 'black', fontSize:18}}>Carregando</Text>
         </View>
-      }
-    {!loading && 
+    }
+    {/* Alerta de delete */}
+    {!loading && showAlert &&
+    <AwesomeAlert
+        show={showAlert}
+        title={alertTitle}
+        message={alertMessage}
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+        showCancelButton={idClient != 0}
+        showConfirmButton={true}
+        cancelText="Cancelar"
+        confirmText="Confirmar"
+        confirmButtonColor="#DD6B55"
+        onCancelPressed={() => {
+          setShowAlert(false)
+          setIdClient(0)
+        }}
+        onConfirmPressed={async () => {
+            if(idClient != 0){
+              await del()
+            } 
+            setShowAlert(false); 
+            setIdClient(0)
+        }}
+      />}
+    {!loading && !showAlert && 
     <>
             <TextInput 
             placeholder="Pesquisar por número"
@@ -118,8 +149,8 @@ const styles = StyleSheet.create({
     },
     list: {
         flex: 1,
-        height:100,
-        width:'80%',
+        height:'100%',
+        width:'100%',
         margin:10,
     }
 })

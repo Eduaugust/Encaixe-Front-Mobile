@@ -65,7 +65,7 @@ const HomeScreen = () => {
           console.log("WhatsApp Opened successfully " + data);
         })
         .catch(() => {
-            Alert.alert('Erro', "Make sure WhatsApp installed on your device");
+            alert("Make sure WhatsApp installed on your device");
         });
     }
 

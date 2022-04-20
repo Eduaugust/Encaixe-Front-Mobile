@@ -16,7 +16,6 @@ const Item = styled.TouchableOpacity`
 
 const ItemText = styled.Text`
     color:white;
-    margin:5px;
 `;
 
 const ItemList = ({data, icon, funcWhoCalled, deleteClient}) => {    
