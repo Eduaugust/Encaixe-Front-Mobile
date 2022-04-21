@@ -65,7 +65,7 @@ const EditScreen = (props) => {
           />}
     {!loading && !showAlert &&
     <BackGroundView>
-        <InsertForms postClient={(data)=>{putClient(data)}} name={userProps.name} number={userProps.number} service={userProps.service} morning={userProps.morning} afternoon={userProps.afternoon} tuesday={userProps.tuesday} wednesday={userProps.wednesday} thursday={userProps.thursday} friday={userProps.friday} saturday={userProps.saturday} start={new Date(userProps.start)} end={new Date(userProps.end)}/>
+        <InsertForms postClient={(data)=>{putClient(data)}} name={userProps.name} number={userProps.number} service={userProps.service} morning={userProps.morning} afternoon={userProps.afternoon} tuesday={userProps.tuesday} wednesday={userProps.wednesday} thursday={userProps.thursday} friday={userProps.friday} saturday={userProps.saturday} start={userProps.start} end={userProps.end}/>
     </BackGroundView>
     }
     </>
