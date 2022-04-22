@@ -11,7 +11,7 @@ const BackGroundView = styled.View`
 `;
 
 const InsertScreen = () => {
-  const todayDate = formatDateToDb(new Date())
+  const todayDate = formatDateToDb(new Date().toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}))
 
   const [loading, setLoading] = useState(false)  
   const [alertMessage, setAlertMessage] = useState('')
@@ -70,12 +70,18 @@ const InsertScreen = () => {
 )}
 
 const formatDateToDb = (date) => {
-  let dateObj = date
-  let month = dateObj.getUTCMonth() + 1; //months from 1-12
-  let day = dateObj.getUTCDate();
-  let year = dateObj.getUTCFullYear();
-  const returnDate = year + "-" + month.pad() + "-" + day.pad();
-  return returnDate
+  if(typeof date == 'object'){
+      let dateObj = date
+      let month = dateObj.getUTCMonth() + 1; //months from 1-12
+      let day = dateObj.getUTCDate();
+      let year = dateObj.getUTCFullYear();
+      return year + "-" + month.pad() + "-" + day.pad();
+  } else {
+      let dateObj = new Date(date)
+      let month = dateObj.getUTCMonth() + 1; //months from 1-12
+      let day = dateObj.getUTCDate();
+      let year = dateObj.getUTCFullYear();
+      return year + "-" + month.pad() + "-" + day.pad();
+  }
 }
-
 export default InsertScreen

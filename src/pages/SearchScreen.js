@@ -23,8 +23,10 @@ const List = styled.FlatList`
 `;
 
 const HomeScreen = () => {
+    const todayDate = formatDateToDb(new Date().toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}))
 
-    const [date, setDate] = useState(formatDateToDb(new Date()))
+
+    const [date, setDate] = useState(todayDate)
     const [data, setData] = useState([]);
     const [alertMessage, setAlertMessage] = useState('')
     const [alertTitle, setAlertTitle] = useState('')
@@ -151,12 +153,19 @@ Number.prototype.pad = function(size) {
 }
 
 const formatDateToDb = (date) => {
-    let dateObj = date
-    let month = dateObj.getUTCMonth() + 1; //months from 1-12
-    let day = dateObj.getUTCDate();
-    let year = dateObj.getUTCFullYear();
-    const returnDate = year + "-" + month.pad() + "-" + day.pad();
-    return returnDate
-}
+    if(typeof date == 'object'){
+        let dateObj = date
+        let month = dateObj.getUTCMonth() + 1; //months from 1-12
+        let day = dateObj.getUTCDate();
+        let year = dateObj.getUTCFullYear();
+        return year + "-" + month.pad() + "-" + day.pad();
+    } else {
+        let dateObj = new Date(date)
+        let month = dateObj.getUTCMonth() + 1; //months from 1-12
+        let day = dateObj.getUTCDate();
+        let year = dateObj.getUTCFullYear();
+        return year + "-" + month.pad() + "-" + day.pad();
+    }
+  }
 
 export default HomeScreen
