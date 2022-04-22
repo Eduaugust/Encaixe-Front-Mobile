@@ -65,10 +65,17 @@ const EditScreen = (props) => {
           />}
     {!loading && !showAlert &&
     <BackGroundView>
-        <InsertForms postClient={(data)=>{putClient(data)}} name={userProps.name} number={userProps.number} service={userProps.service} morning={userProps.morning} afternoon={userProps.afternoon} tuesday={userProps.tuesday} wednesday={userProps.wednesday} thursday={userProps.thursday} friday={userProps.friday} saturday={userProps.saturday} start={userProps.start} end={userProps.end}/>
+        <InsertForms postClient={(data)=>{putClient(data)}} name={userProps.name} number={userProps.number} service={userProps.service} morning={userProps.morning} afternoon={userProps.afternoon} tuesday={userProps.tuesday} wednesday={userProps.wednesday} thursday={userProps.thursday} friday={userProps.friday} saturday={userProps.saturday} start={reverseStr(userProps.start)} end={reverseStr(userProps.end)}/>
     </BackGroundView>
     }
     </>
 )}
+
+const reverseStr = (str) => {
+  const strSplit = str.split("-")
+  const strReverse = strSplit.reverse()
+  const strR = strReverse.join('/')
+  return strR
+}
 
 export default EditScreen
